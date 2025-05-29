@@ -22,6 +22,40 @@ exports.signUp = async (req, res) => {
   }
 };
 
+exports.signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    // 1)
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required !!!!",
+      });
+    }
+    // 2)
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: "Userr not found !!!!",
+      });
+    }
+    // 3)
+    if (!(await user.verifyPass(password, user.password))) {
+      return res.status(400).json({
+        message: "Password incorrect !!!!",
+      });
+    }
+
+    res.status(201).json({
+      message: "Logged in !!!!",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "fail!!!",
+      error: error,
+    });
+  }
+};
+
 exports.createUser = async (req, res) => {
   try {
     const newUser = await User.create(req.body);
